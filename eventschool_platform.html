@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventSchool - School Event Management System | DAS-SCH-005</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Tailwind CSS CDN with Custom Theme Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#FFF7ED',
+                            100: '#FED7AA',
+                            200: '#FDBA74',
+                            300: '#FB923C',
+                            400: '#F97316',
+                            500: '#F97316',
+                            600: '#EA580C',
+                            700: '#C2410C',
+                            800: '#9A3412',
+                            900: '#7C2D12',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom Customizations & Scrollbars */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+        }
+        .dark body {
+            background-color: #0F172A;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        .dark ::webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        
+        /* Print Styles for Exporting Reports */
+        @media print {
+            aside, header, .no-print {
+                display: none !important;
+            }
+            main {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- App Wrapper -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col justify-between">
+            <div>
+                <!-- Brand Header -->
+                <div class="h-16 flex items-center justify-between px-5 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center space-x-3 cursor-pointer" onclick="switchSection('dashboard')">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-amber-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                            <i class="fa-solid fa-graduation-cap text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="font-bold text-lg text-slate-900 dark:text-white leading-tight">EventSchool</h1>
+                            <p class="text-xs text-brand-500 font-semibold tracking-wider">MANAGEMENT</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
+                    <p class="px-3 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Main Menu</p>
+
+                    <button onclick="switchSection('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-colors text-brand-600 bg-brand-50 dark:bg-slate-800 dark:text-brand-400">
+                        <i class="fa-solid fa-[#chart-pie] text-slate-500 w-5"></i>
+                        <i class="fa-solid fa-chart-pie w-5"></i>
+                        <span>Dashboard</span>
+                    </button>
+
+                    <button onclick="switchSection('events')" id="nav-events" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-calendar-days w-5 text-slate-400"></i>
+                        <span>Events List</span>
+                    </button>
+
+                    <button onclick="switchSection('registrations')" id="nav-registrations" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-id-card w-5 text-slate-400"></i>
+                        <span>Registrations</span>
+                    </button>
+
+                    <button onclick="switchSection('schedule')" id="nav-schedule" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-clock-rotate-left w-5 text-slate-400"></i>
+                        <span>Schedule Planner</span>
+                    </button>
+
+                    <p class="px-3 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-5 mb-2">Logistics & Operations</p>
+
+                    <button onclick="switchSection('resources')" id="nav-resources" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-boxes-packing w-5 text-slate-400"></i>
+                        <span>Resources</span>
+                    </button>
+
+                    <button onclick="switchSection('volunteers')" id="nav-volunteers" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-hands-helping w-5 text-slate-400"></i>
+                        <span>Volunteers</span>
+                    </button>
+
+                    <button onclick="switchSection('budget')" id="nav-budget" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-wallet w-5 text-slate-400"></i>
+                        <span>Budget & Expenses</span>
+                    </button>
+
+                    <p class="px-3 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-5 mb-2">Media & Reports</p>
+
+                    <button onclick="switchSection('calendar')" id="nav-calendar" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-calendar-check w-5 text-slate-400"></i>
+                        <span>Event Calendar</span>
+                    </button>
+
+                    <button onclick="switchSection('gallery')" id="nav-gallery" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-images w-5 text-slate-400"></i>
+                        <span>Photo Gallery</span>
+                    </button>
+
+                    <button onclick="switchSection('reports')" id="nav-reports" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                        <i class="fa-solid fa-file-invoice-dollar w-5 text-slate-400"></i>
+                        <span>Reports & Export</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Sidebar Footer / Internship Info -->
+            <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 text-xs font-bold">
+                        DAS
+                    </div>
+                    <div class="text-xs truncate">
+                        <p class="font-semibold text-slate-700 dark:text-slate-200 truncate">Data Alcott Systems</p>
+                        <p class="text-slate-400 text-[10px]">Task ID: WD-SCH-005</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay (Mobile) -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 z-30 bg-slate-900/40 backdrop-blur-sm hidden md:hidden"></div>
+
+        <!-- Main Workspace Area -->
+        <div class="flex-1 flex flex-col min-w-0 md:pl-64">
+
+            <!-- Top Header Bar -->
+            <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 z-20">
+                <div class="flex items-center space-x-3">
+                    <button onclick="toggleSidebar()" class="md:hidden text-slate-500 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div class="hidden sm:flex items-center text-xs text-slate-400 space-x-2">
+                        <span>EventSchool</span>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        <span id="breadcrumb-active" class="font-semibold text-slate-700 dark:text-slate-200">Dashboard</span>
+                    </div>
+                </div>
+
+                <!-- Top Right Quick Controls -->
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <!-- Quick Stats Badge -->
+                    <div class="hidden lg:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40 text-xs font-semibold">
+                        <i class="fa-solid fa-fire text-brand-500"></i>
+                        <span>Live Session 2026</span>
+                    </div>
+
+                    <!-- Role Switcher -->
+                    <div class="relative">
+                        <select id="user-role-selector" onchange="changeUserRole(this.value)" class="text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer">
+                            <option value="Admin">👑 Role: Admin</option>
+                            <option value="Coordinator">📋 Role: Coordinator</option>
+                            <option value="Volunteer">🤝 Role: Volunteer</option>
+                        </select>
+                    </div>
+
+                    <!-- Notifications Button -->
+                    <button onclick="toggleNotificationsModal()" class="relative p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                        <i class="fa-regular fa-bell text-lg"></i>
+                        <span id="notif-badge" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-brand-500 rounded-full ring-2 ring-white dark:ring-slate-900"></span>
+                    </button>
+
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Toggle Light/Dark Theme">
+                        <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                    </button>
+
+                    <!-- User Profile Avatar -->
+                    <div class="flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover ring-2 ring-brand-500/30">
+                        <div class="hidden xl:block text-left">
+                            <p class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">Dr. Sarah Jenkins</p>
+                            <p id="role-display" class="text-[10px] text-slate-400">School Event Director</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content Viewport -->
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+                <!-- SECTION 1: DASHBOARD OVERVIEW -->
+                <section id="section-dashboard" class="space-y-6">
+                    <!-- Dashboard Banner -->
+                    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-600 via-orange-500 to-amber-500 p-6 sm:p-8 text-white shadow-xl shadow-brand-500/15">
+                        <div class="relative z-10 max-w-2xl">
+                            <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold mb-3">Academic Term 2026</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Welcome to EventSchool Management Platform</h2>
+                            <p class="mt-2 text-white/90 text-sm leading-relaxed">Streamline all school functions, athletic sports days, cultural festivals, parent meetings, and workshops in one unified dashboard.</p>
+                            
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <button onclick="openModal('modal-event-form')" class="btn-role-restricted px-4 py-2.5 bg-white text-brand-600 hover:bg-slate-50 font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-2">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>Create New Event</span>
+                                </button>
+                                <button onclick="openModal('modal-registration')" class="px-4 py-2.5 bg-brand-700/60 hover:bg-brand-800/60 backdrop-blur-md text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-2">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                    <span>Quick Registration</span>
+                                </button>
+                                <button onclick="exportCSVReport()" class="px-4 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-2">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>Overview Report</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="absolute -right-8 -bottom-10 opacity-20 text-white pointer-events-none hidden sm:block">
+                            <i class="fa-solid fa-calendar-star text-[220px]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Summary KPI Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400">Total School Events</p>
+                                <h3 id="stat-total-events" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</h3>
+                                <p class="text-[11px] text-emerald-500 font-semibold mt-1 flex items-center">
+                                    <i class="fa-solid fa-arrow-trend-up mr-1"></i> +12% this term
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-950/50 text-brand-500 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400">Active Registrations</p>
+                                <h3 id="stat-registrations" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</h3>
+                                <p class="text-[11px] text-emerald-500 font-semibold mt-1 flex items-center">
+                                    <i class="fa-solid fa-circle-check mr-1"></i> High participation
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/50 text-blue-500 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400">Budget Spent / Allocated</p>
+                                <h3 id="stat-budget-spent" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">$0</h3>
+                                <p id="stat-budget-allocated" class="text-[11px] text-slate-400 font-medium mt-1">of $0 allocated</p>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/50 text-emerald-500 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-hand-holding-dollar"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400">Assigned Volunteers</p>
+                                <h3 id="stat-volunteers" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</h3>
+                                <p class="text-[11px] text-amber-500 font-semibold mt-1 flex items-center">
+                                    <i class="fa-solid fa-user-gear mr-1"></i> Active shifts
+                                </p>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-950/50 text-purple-500 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-hands-helping"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Visual Analytics Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Doughnut Chart -->
+                        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm lg:col-span-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Category Distribution</h3>
+                                    <span class="text-xs text-slate-400">All Statuses</span>
+                                </div>
+                                <div class="relative h-56 flex items-center justify-center">
+                                    <canvas id="categoryChart"></canvas>
+                                </div>
+                            </div>
+                            <p class="text-xs text-center text-slate-400 mt-4">Breakdown by academic, cultural & athletic categories.</p>
+                        </div>
+
+                        <!-- Bar Chart -->
+                        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm lg:col-span-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Registration & Attendance Rates</h3>
+                                    <p class="text-xs text-slate-400">Registered vs Maximum Capacity per Event</p>
+                                </div>
+                                <span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300">Live Sync</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="attendanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Events Quick Slider / Grid -->
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-bolt text-brand-500"></i>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Upcoming Event Highlights</h3>
+                            </div>
+                            <button onclick="switchSection('events')" class="text-xs font-bold text-brand-500 hover:text-brand-600 flex items-center space-x-1">
+                                <span>View All Events</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+
+                        <div id="dashboard-upcoming-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Dynamic render -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: EVENT LISTING & SEARCH/FILTER -->
+                <section id="section-events" class="space-y-6 hidden">
+                    <!-- Section Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">School Events Catalogue</h2>
+                            <p class="text-xs text-slate-400">Search, filter, edit, or register for institutional activities</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <!-- Grid / Table View Switcher -->
+                            <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex items-center">
+                                <button onclick="setEventViewMode('grid')" id="btn-view-grid" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-700 text-brand-500 shadow-sm">
+                                    <i class="fa-solid fa-grip mr-1"></i> Grid
+                                </button>
+                                <button onclick="setEventViewMode('table')" id="btn-view-table" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+                                    <i class="fa-solid fa-list mr-1"></i> Table
+                                </button>
+                            </div>
+
+                            <button onclick="openModal('modal-event-form')" class="btn-role-restricted px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>New Event</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search and Filters Bar -->
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <!-- Search Bar -->
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                                <input type="text" id="event-search-input" oninput="renderEventsList()" placeholder="Search by title, description or venue..." class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+                            </div>
+
+                            <!-- Category Filter Dropdown -->
+                            <select id="event-category-filter" onchange="renderEventsList()" class="py-2 px-3 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-700 dark:text-slate-200 font-medium">
+                                <option value="ALL">All Categories</option>
+                                <option value="Academic">🎓 Academic Events</option>
+                                <option value="Cultural">🎨 Cultural Events</option>
+                                <option value="Sports">🏆 Sports Events</option>
+                                <option value="Workshops">📢 Workshops</option>
+                                <option value="Parent-Teacher Meets">🤝 Parent-Teacher Meets</option>
+                                <option value="Celebrations">🎉 Celebrations</option>
+                            </select>
+
+                            <!-- Status Filter Dropdown -->
+                            <select id="event-status-filter" onchange="renderEventsList()" class="py-2 px-3 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-700 dark:text-slate-200 font-medium">
+                                <option value="ALL">All Statuses</option>
+                                <option value="Planning">📝 Planning</option>
+                                <option value="Open for Registration">📢 Open for Registration</option>
+                                <option value="In Progress">🔄 In Progress</option>
+                                <option value="Completed">✅ Completed</option>
+                                <option value="Cancelled">❌ Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Render Area: Grid View -->
+                    <div id="events-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- Render Area: Table View -->
+                    <div id="events-table-container" class="hidden bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 dark:bg-slate-800/70 text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+                                    <tr>
+                                        <th class="p-4">Event Details</th>
+                                        <th class="p-4">Category</th>
+                                        <th class="p-4">Date & Time</th>
+                                        <th class="p-4">Venue</th>
+                                        <th class="p-4">Status</th>
+                                        <th class="p-4">Capacity</th>
+                                        <th class="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="events-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 3: REGISTRATION MANAGEMENT -->
+                <section id="section-registrations" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Registration & Check-In Desk</h2>
+                            <p class="text-xs text-slate-400">Track student, teacher, parent, and guest registrations</p>
+                        </div>
+                        <button onclick="openModal('modal-registration')" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>New Registration</span>
+                        </button>
+                    </div>
+
+                    <!-- Registration KPI Summary -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-slate-400">Total Registered</p>
+                                <h4 id="reg-stat-total" class="text-xl font-bold text-slate-800 dark:text-slate-100 mt-1">0</h4>
+                            </div>
+                            <i class="fa-solid fa-address-book text-2xl text-brand-500"></i>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-slate-400">Checked In On-Site</p>
+                                <h4 id="reg-stat-checked" class="text-xl font-bold text-emerald-500 mt-1">0</h4>
+                            </div>
+                            <i class="fa-solid fa-user-check text-2xl text-emerald-500"></i>
+                        </div>
+                        <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                            <div>
+                                <p class="text-xs text-slate-400">Check-in Rate</p>
+                                <h4 id="reg-stat-rate" class="text-xl font-bold text-blue-500 mt-1">0%</h4>
+                            </div>
+                            <i class="fa-solid fa-chart-line text-2xl text-blue-500"></i>
+                        </div>
+                    </div>
+
+                    <!-- Attendees Table Container -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-3 justify-between items-center">
+                            <div class="relative w-full sm:w-72">
+                                <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-xs"></i>
+                                <input type="text" id="reg-search-input" oninput="renderRegistrationsTable()" placeholder="Search participant name/email..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            </div>
+
+                            <select id="reg-event-filter" onchange="renderRegistrationsTable()" class="w-full sm:w-60 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2 font-medium">
+                                <option value="ALL">All Events</option>
+                            </select>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 dark:bg-slate-800/70 text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+                                    <tr>
+                                        <th class="p-4">Participant Name</th>
+                                        <th class="p-4">Type</th>
+                                        <th class="p-4">Assigned Event</th>
+                                        <th class="p-4">Contact Details</th>
+                                        <th class="p-4">Registration Date</th>
+                                        <th class="p-4">Check-In Status</th>
+                                        <th class="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="registrations-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4: SCHEDULE PLANNING -->
+                <section id="section-schedule" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Event Timelines & Session Planner</h2>
+                            <p class="text-xs text-slate-400">Map hour-by-hour agendas, guest speakers, and keynote rooms</p>
+                        </div>
+                        <button onclick="openModal('modal-session')" class="btn-role-restricted px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Session Slot</span>
+                        </button>
+                    </div>
+
+                    <!-- Event Select Filter -->
+                    <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Select Event Timeline:</label>
+                        <select id="schedule-event-select" onchange="renderScheduleTimeline()" class="text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 font-semibold text-brand-600 dark:text-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <!-- Filled by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Timeline Container -->
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm">
+                        <div id="schedule-timeline-container" class="relative border-l-2 border-brand-200 dark:border-slate-700 pl-6 space-y-8">
+                            <!-- Dynamic rendering of sessions -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 5: RESOURCE MANAGEMENT -->
+                <section id="section-resources" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Inventory & Resource Inventory</h2>
+                            <p class="text-xs text-slate-400">Equipment, audio/visual gear, podiums, chairs, and catering supplies</p>
+                        </div>
+                        <button onclick="openModal('modal-resource')" class="btn-role-restricted px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Resource</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 dark:bg-slate-800/70 text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+                                    <tr>
+                                        <th class="p-4">Item Name</th>
+                                        <th class="p-4">Category</th>
+                                        <th class="p-4">Assigned Event</th>
+                                        <th class="p-4">Quantity</th>
+                                        <th class="p-4">Status</th>
+                                        <th class="p-4">Est. Cost</th>
+                                        <th class="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resources-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 6: VOLUNTEER COORDINATION -->
+                <section id="section-volunteers" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Volunteer Roster & Duty Desk</h2>
+                            <p class="text-xs text-slate-400">Assign student/staff volunteers to logistics, welcome desk, or security</p>
+                        </div>
+                        <button onclick="openModal('modal-volunteer')" class="btn-role-restricted px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Assign Volunteer</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="volunteers-grid">
+                        <!-- Dynamic rendering of volunteers -->
+                    </div>
+                </section>
+
+                <!-- SECTION 7: BUDGET TRACKING & EXPENSES -->
+                <section id="section-budget" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Budget Allocation & Financial Tracker</h2>
+                            <p class="text-xs text-slate-400">Monitor school event expenses, sponsorships, income, and balance progress</p>
+                        </div>
+                        <button onclick="openModal('modal-transaction')" class="btn-role-restricted px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Transaction</span>
+                        </button>
+                    </div>
+
+                    <!-- Financial Summary Bar -->
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <div>
+                                <p class="text-xs text-slate-400">Total Allocated Budget</p>
+                                <h3 id="budget-summary-allocated" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">$0</h3>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400">Total Expenses Paid</p>
+                                <h3 id="budget-summary-spent" class="text-2xl font-bold text-rose-500 mt-1">$0</h3>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400">Remaining Balance</p>
+                                <h3 id="budget-summary-remaining" class="text-2xl font-bold text-emerald-500 mt-1">$0</h3>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1">
+                                <span class="text-slate-500">Budget Utilization</span>
+                                <span id="budget-utilization-percent" class="text-brand-500">0%</span>
+                            </div>
+                            <div class="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div id="budget-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-500 transition-all duration-500 w-0"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ledger Table -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Itemized Ledger Transactions</h3>
+                            <button onclick="exportCSVReport()" class="text-xs font-semibold text-brand-500 hover:text-brand-600">
+                                <i class="fa-solid fa-file-csv mr-1"></i> Export Ledger
+                            </button>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-50 dark:bg-slate-800/70 text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+                                    <tr>
+                                        <th class="p-4">Transaction / Description</th>
+                                        <th class="p-4">Event</th>
+                                        <th class="p-4">Category</th>
+                                        <th class="p-4">Type</th>
+                                        <th class="p-4">Amount</th>
+                                        <th class="p-4">Status</th>
+                                        <th class="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="budget-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 8: INTERACTIVE EVENT CALENDAR -->
+                <section id="section-calendar" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Institutional Event Calendar</h2>
+                            <p class="text-xs text-slate-400">Monthly schedule overview with date-based event tagging</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200">November 2026</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm p-4 sm:p-6 overflow-x-auto">
+                        <!-- Calendar Days Header -->
+                        <div class="grid grid-cols-7 gap-2 mb-2 text-center text-xs font-bold text-slate-400 uppercase">
+                            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                        </div>
+
+                        <!-- Grid Cells -->
+                        <div id="calendar-grid-cells" class="grid grid-cols-7 gap-2">
+                            <!-- JS dynamic grid creation -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 9: PHOTO GALLERY -->
+                <section id="section-gallery" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">School Event Photo Gallery</h2>
+                            <p class="text-xs text-slate-400">Captured moments from Science Fairs, Cultural Fests & Sports Days</p>
+                        </div>
+                        <button onclick="openModal('modal-upload-photo')" class="btn-role-restricted px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Upload Photo</span>
+                        </button>
+                    </div>
+
+                    <!-- Gallery Category Filter -->
+                    <div class="flex flex-wrap gap-2" id="gallery-category-pills">
+                        <button onclick="filterGallery('ALL')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-500 text-white shadow-sm">All Highlights</button>
+                        <button onclick="filterGallery('Academic')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">🎓 Academic</button>
+                        <button onclick="filterGallery('Cultural')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">🎨 Cultural</button>
+                        <button onclick="filterGallery('Sports')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">🏆 Sports</button>
+                    </div>
+
+                    <!-- Image Showcase Grid -->
+                    <div id="gallery-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Dynamic rendered by JS -->
+                    </div>
+                </section>
+
+                <!-- SECTION 10: REPORTS & EXPORT -->
+                <section id="section-reports" class="space-y-6 hidden">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Executive Reports & Analytics</h2>
+                            <p class="text-xs text-slate-400">Generate printable summaries, attendance stats, and budget reports</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="exportCSVReport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                                <i class="fa-solid fa-file-csv"></i>
+                                <span>Export Complete CSV</span>
+                            </button>
+                            <button onclick="window.print()" class="px-4 py-2 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center space-x-1.5">
+                                <i class="fa-solid fa-print"></i>
+                                <span>Print Summary</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Printable Container Block -->
+                    <div class="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
+                        <div class="border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-start">
+                            <div>
+                                <h3 class="text-2xl font-bold text-brand-500">EventSchool Official Activity Report</h3>
+                                <p class="text-xs text-slate-400">Data Alcott Systems Internship Platform · Student Code: DAS-SCH-005</p>
+                            </div>
+                            <span class="text-xs font-semibold px-3 py-1 bg-brand-50 dark:bg-slate-800 text-brand-600 rounded-lg">Term 2026 Summary</span>
+                        </div>
+
+                        <!-- Report Summary Data -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl text-center">
+                            <div>
+                                <p class="text-xs text-slate-400">Events Managed</p>
+                                <p id="report-events-count" class="text-xl font-bold text-slate-800 dark:text-slate-100">0</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400">Total Participants</p>
+                                <p id="report-registrations-count" class="text-xl font-bold text-slate-800 dark:text-slate-100">0</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400">Active Volunteers</p>
+                                <p id="report-volunteers-count" class="text-xl font-bold text-slate-800 dark:text-slate-100">0</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-400">Total Budget</p>
+                                <p id="report-budget-sum" class="text-xl font-bold text-brand-500">$0</p>
+                            </div>
+                        </div>
+
+                        <!-- Report Breakdown Roster -->
+                        <div class="space-y-4">
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Event Execution Breakdown</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead class="bg-slate-100 dark:bg-slate-800 text-slate-500 font-bold uppercase">
+                                        <tr>
+                                            <th class="p-3">Title</th>
+                                            <th class="p-3">Category</th>
+                                            <th class="p-3">Date</th>
+                                            <th class="p-3">Venue</th>
+                                            <th class="p-3">Status</th>
+                                            <th class="p-3">Budget</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="report-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
+                                        <!-- Rendered JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FOOTER DISCLOSURE -->
+                <footer class="pt-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400 space-y-1">
+                    <p>🎉 <strong>EventSchool</strong> — Free Web Development Internship Online Task (Task ID: <span class="text-brand-500 font-bold">WD-SCH-005</span>)</p>
+                    <p>Designed for <strong>Data Alcott Systems</strong> · Chennai, India · Student Code: <span class="font-semibold text-slate-600 dark:text-slate-300">DAS-SCH-005</span></p>
+                </footer>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MODALS CONTAINER ==================== -->
+
+    <!-- MODAL 1: EVENT CREATE / EDIT MODAL -->
+    <div id="modal-event-form" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 id="modal-event-form-title" class="text-lg font-bold text-slate-900 dark:text-white">Create New Event</h3>
+                <button onclick="closeModal('modal-event-form')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-event" onsubmit="handleSaveEvent(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="event-id-input">
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Event Title *</label>
+                    <input type="text" id="event-title-input" required placeholder="e.g. Annual Science Fair 2026" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Category *</label>
+                        <select id="event-category-input" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                            <option value="Academic">🎓 Academic</option>
+                            <option value="Cultural">🎨 Cultural</option>
+                            <option value="Sports">🏆 Sports</option>
+                            <option value="Workshops">📢 Workshops</option>
+                            <option value="Parent-Teacher Meets">🤝 Parent-Teacher Meets</option>
+                            <option value="Celebrations">🎉 Celebrations</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status *</label>
+                        <select id="event-status-input" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                            <option value="Planning">📝 Planning</option>
+                            <option value="Open for Registration">📢 Open for Registration</option>
+                            <option value="In Progress">🔄 In Progress</option>
+                            <option value="Completed">✅ Completed</option>
+                            <option value="Cancelled">❌ Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Date *</label>
+                        <input type="date" id="event-date-input" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Time Slot *</label>
+                        <input type="text" id="event-time-input" required placeholder="09:00 AM - 04:00 PM" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Venue / Location *</label>
+                        <input type="text" id="event-venue-input" required placeholder="Main Auditorium" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Max Capacity *</label>
+                        <input type="number" id="event-capacity-input" min="1" required placeholder="200" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Budget Allocation ($) *</label>
+                        <input type="number" id="event-budget-input" min="0" required placeholder="15000" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Cover Image URL</label>
+                        <input type="url" id="event-image-input" placeholder="https://images.unsplash.com/..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Description & Overview</label>
+                    <textarea id="event-desc-input" rows="3" placeholder="Provide event goals, highlights, and guidelines..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500"></textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('modal-event-form')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl font-bold text-slate-600 dark:text-slate-300">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl shadow-md">Save Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: EVENT DETAIL MODAL (Tabs View) -->
+    <div id="modal-event-detail" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-6">
+            <div class="relative h-48 rounded-xl overflow-hidden -mx-6 -mt-6">
+                <img id="detail-img" src="" alt="Cover" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                <button onclick="closeModal('modal-event-detail')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-900/60 text-white flex items-center justify-center hover:bg-slate-900"><i class="fa-solid fa-xmark"></i></button>
+                <div class="absolute bottom-4 left-6 right-6 flex items-end justify-between">
+                    <div>
+                        <span id="detail-category-badge" class="px-2.5 py-1 bg-brand-500 text-white font-bold text-[10px] rounded-lg tracking-wider uppercase">Category</span>
+                        <h2 id="detail-title" class="text-xl sm:text-2xl font-bold text-white mt-1">Event Title</h2>
+                    </div>
+                    <span id="detail-status-badge" class="px-3 py-1 bg-white/90 font-bold text-xs rounded-lg text-slate-800">Status</span>
+                </div>
+            </div>
+
+            <!-- Detail Tabs Bar -->
+            <div class="flex border-b border-slate-200 dark:border-slate-800 text-xs font-bold space-x-4">
+                <button onclick="switchDetailTab('summary')" id="tab-btn-summary" class="pb-2 border-b-2 border-brand-500 text-brand-500">Summary & Info</button>
+                <button onclick="switchDetailTab('schedule')" id="tab-btn-schedule" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-700">Agenda</button>
+                <button onclick="switchDetailTab('attendees')" id="tab-btn-attendees" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-700">Attendees</button>
+            </div>
+
+            <!-- Tab Content 1: Summary -->
+            <div id="detail-tab-summary" class="space-y-4 text-xs">
+                <p id="detail-description" class="text-slate-600 dark:text-slate-300 leading-relaxed">Description goes here...</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl">
+                    <div>
+                        <span class="text-slate-400 text-[10px] block">Date</span>
+                        <span id="detail-date" class="font-bold text-slate-800 dark:text-slate-200">2026-11-15</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 text-[10px] block">Time</span>
+                        <span id="detail-time" class="font-bold text-slate-800 dark:text-slate-200">09:00 AM</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 text-[10px] block">Venue</span>
+                        <span id="detail-venue" class="font-bold text-slate-800 dark:text-slate-200">Main Auditorium</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 text-[10px] block">Allocated Budget</span>
+                        <span id="detail-budget" class="font-bold text-brand-500">$15,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Agenda -->
+            <div id="detail-tab-schedule" class="space-y-3 text-xs hidden">
+                <div id="detail-schedule-list" class="space-y-2"></div>
+            </div>
+
+            <!-- Tab Content 3: Attendees -->
+            <div id="detail-tab-attendees" class="space-y-3 text-xs hidden">
+                <div id="detail-attendees-list" class="space-y-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ADD REGISTRATION MODAL -->
+    <div id="modal-registration" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Register Participant</h3>
+                <button onclick="closeModal('modal-registration')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-registration" onsubmit="handleSaveRegistration(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Select Event *</label>
+                    <select id="reg-event-id" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                        <!-- Filled by JS -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Full Name *</label>
+                    <input type="text" id="reg-name" required placeholder="e.g. Rahul Sharma" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Participant Type *</label>
+                        <select id="reg-type" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <option value="Student">👨‍🎓 Student</option>
+                            <option value="Teacher">👨‍🏫 Teacher</option>
+                            <option value="Parent">👨‍👩‍👧‍👦 Parent</option>
+                            <option value="Guest Speaker">🎤 Guest Speaker</option>
+                            <option value="Volunteer">🤝 Volunteer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Phone Number *</label>
+                        <input type="tel" id="reg-phone" required placeholder="+91 9876543210" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Email Address *</label>
+                    <input type="email" id="reg-email" required placeholder="rahul@school.edu" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('modal-registration')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl shadow-md">Complete Registration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: ADD SESSION SLOT -->
+    <div id="modal-session" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Add Session Slot</h3>
+                <button onclick="closeModal('modal-session')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-session" onsubmit="handleSaveSession(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Target Event *</label>
+                    <select id="session-event-id" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"></select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Session Title *</label>
+                    <input type="text" id="session-title" required placeholder="Keynote: AI in STEM" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Speaker / Host</label>
+                        <input type="text" id="session-speaker" placeholder="Prof. Anita Verma" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Location Room</label>
+                        <input type="text" id="session-location" placeholder="Auditorium Stage A" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Start Time</label>
+                        <input type="text" id="session-start" placeholder="10:00 AM" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">End Time</label>
+                        <input type="text" id="session-end" placeholder="11:30 AM" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('modal-session')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl">Save Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 5: ADD RESOURCE -->
+    <div id="modal-resource" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Add Equipment / Resource</h3>
+                <button onclick="closeModal('modal-resource')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-resource" onsubmit="handleSaveResource(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Resource Name *</label>
+                    <input type="text" id="resource-name" required placeholder="HD Digital Projector 4K" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Category</label>
+                        <select id="resource-category" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <option value="Audio/Visual">Audio/Visual</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Catering Supplies">Catering Supplies</option>
+                            <option value="Stage & Lighting">Stage & Lighting</option>
+                            <option value="Sports Equipment">Sports Equipment</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Quantity</label>
+                        <input type="number" id="resource-qty" min="1" value="1" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Assigned Event</label>
+                    <select id="resource-event-id" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"></select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Status</label>
+                        <select id="resource-status" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <option value="Available">Available</option>
+                            <option value="Reserved">Reserved</option>
+                            <option value="In Use">In Use</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Est. Cost ($)</label>
+                        <input type="number" id="resource-cost" min="0" placeholder="450" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('modal-resource')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl">Save Resource</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 6: ASSIGN VOLUNTEER -->
+    <div id="modal-volunteer" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Assign Volunteer Duty</h3>
+                <button onclick="closeModal('modal-volunteer')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-volunteer" onsubmit="handleSaveVolunteer(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Volunteer Name *</label>
+                    <input type="text" id="vol-name" required placeholder="Aarav Patel" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Role Shift</label>
+                        <select id="vol-role" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <option value="Welcome Desk">Welcome Desk</option>
+                            <option value="Logistics">Logistics</option>
+                            <option value="Technical Support">Technical Support</option>
+                            <option value="Security">Security</option>
+                            <option value="Catering">Catering</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Contact Phone</label>
+                        <input type="tel" id="vol-contact" placeholder="+91 9988776655" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Assigned Event</label>
+                    <select id="vol-event-id" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"></select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Specific Task Assignment</label>
+                    <input type="text" id="vol-task" placeholder="Manage entry badges & scanner at Main Gate" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('modal-volunteer')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl">Assign Duty</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 7: ADD TRANSACTION -->
+    <div id="modal-transaction" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Add Financial Transaction</h3>
+                <button onclick="closeModal('modal-transaction')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-transaction" onsubmit="handleSaveTransaction(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Description *</label>
+                    <input type="text" id="trans-desc" required placeholder="Stage LED Screen Rental" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Transaction Type</label>
+                        <select id="trans-type" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                            <option value="Expense">🔴 Expense</option>
+                            <option value="Income">🟢 Income / Sponsorship</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Amount ($) *</label>
+                        <input type="number" id="trans-amount" min="1" required placeholder="1200" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Related Event</label>
+                    <select id="trans-event-id" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"></select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Category</label>
+                    <input type="text" id="trans-category" placeholder="Venue Setup / Audio & Sound" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('modal-transaction')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl">Record Ledger</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 8: PHOTO LIGHTBOX -->
+    <div id="modal-lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full text-center space-y-3">
+            <button onclick="closeModal('modal-lightbox')" class="absolute -top-10 right-0 text-white text-2xl hover:text-brand-500"><i class="fa-solid fa-xmark"></i></button>
+            <img id="lightbox-img" src="" alt="Full Preview" class="max-h-[80vh] mx-auto rounded-xl object-contain shadow-2xl">
+            <p id="lightbox-caption" class="text-sm font-semibold text-white/90"></p>
+        </div>
+    </div>
+
+    <!-- MODAL 9: UPLOAD PHOTO SIMULATOR -->
+    <div id="modal-upload-photo" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Upload Event Photo</h3>
+                <button onclick="closeModal('modal-upload-photo')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="form-upload-photo" onsubmit="handleSaveGalleryPhoto(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Target Event *</label>
+                    <select id="gallery-event-id" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl"></select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Photo Image URL *</label>
+                    <input type="url" id="gallery-url" required placeholder="https://images.unsplash.com/..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Caption / Headline *</label>
+                    <input type="text" id="gallery-caption" required placeholder="Robotics Team presenting award project" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-3">
+                    <button type="button" onclick="closeModal('modal-upload-photo')" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl">Add to Gallery</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 10: NOTIFICATIONS DRAWER -->
+    <div id="modal-notifications" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs hidden flex justify-end">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-sm h-full p-5 shadow-2xl border-l border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3 mb-4">
+                    <h3 class="font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-bell text-brand-500"></i>
+                        <span>System Notifications</span>
+                    </h3>
+                    <button onclick="toggleNotificationsModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div id="notifications-list" class="space-y-3 overflow-y-auto max-h-[75vh]">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+
+            <button onclick="clearNotifications()" class="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-bold rounded-xl text-slate-600 dark:text-slate-300">Clear All Alerts</button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION STACK CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        /* ==================== STATE INITIALIZATION ==================== */
+        const STORAGE_KEY = 'eventschool_app_data_v1';
+
+        // Sample Seed Data
+        const seedData = {
+            events: [
+                {
+                    id: 1,
+                    title: "Annual Science & Tech Fair 2026",
+                    description: "Students showcase innovative STEM models, robotics exhibits, machine learning demos, and scientific research projects.",
+                    category: "Academic",
+                    date: "2026-11-15",
+                    time: "09:00 AM - 04:00 PM",
+                    venue: "Main School Auditorium",
+                    status: "Open for Registration",
+                    max_participants: 200,
+                    budget: 15000,
+                    image: "https://images.unsplash.com/photo-1564069114553-7215e1ff1890?auto=format&fit=crop&w=800&q=80"
+                },
+                {
+                    id: 2,
+                    title: "Inter-House Annual Sports Meet",
+                    description: "High-energy athletic competitions including 100m sprint, relay, long jump, tug of war, and trophy distribution ceremony.",
+                    category: "Sports",
+                    date: "2026-12-10",
+                    time: "08:00 AM - 05:00 PM",
+                    venue: "School Sports Complex Field",
+                    status: "Planning",
+                    max_participants: 500,
+                    budget: 25000,
+                    image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80"
+                },
+                {
+                    id: 3,
+                    title: "Rhythm 2026 Cultural Extravaganza",
+                    description: "Music band performances, classical & hip-hop dance face-offs, drama plays, and fine arts live canvas painting.",
+                    category: "Cultural",
+                    date: "2026-11-28",
+                    time: "10:00 AM - 08:00 PM",
+                    venue: "Open Air Amphitheatre",
+                    status: "Open for Registration",
+                    max_participants: 400,
+                    budget: 30000,
+                    image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80"
+                },
+                {
+                    id: 4,
+                    title: "Hands-on AI & Robotics Workshop",
+                    description: "Introductory workshop for high schoolers on building micro-controllers and web development fundamentals.",
+                    category: "Workshops",
+                    date: "2026-11-08",
+                    time: "11:00 AM - 02:00 PM",
+                    venue: "Computer Lab 3",
+                    status: "In Progress",
+                    max_participants: 60,
+                    budget: 5000,
+                    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80"
+                },
+                {
+                    id: 5,
+                    title: "Q4 Parent-Teacher Synergy Summit",
+                    description: "Interactive session between parents, guardians, and educators discussing academic roadmap and student growth.",
+                    category: "Parent-Teacher Meets",
+                    date: "2026-11-20",
+                    time: "09:00 AM - 01:00 PM",
+                    venue: "Classrooms Block B",
+                    status: "Open for Registration",
+                    max_participants: 300,
+                    budget: 3000,
+                    image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80"
+                },
+                {
+                    id: 6,
+                    title: "Grand Autumn Fest & Lantern Night",
+                    description: "Traditional festival celebration with sweet stalls, musical light shows, and student leadership awards.",
+                    category: "Celebrations",
+                    date: "2026-10-30",
+                    time: "02:00 PM - 07:00 PM",
+                    venue: "Central Courtyard",
+                    status: "Completed",
+                    max_participants: 450,
+                    budget: 18000,
+                    image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80"
+                }
+            ],
+            registrations: [
+                { id: 101, event_id: 1, name: "Rahul Sharma", type: "Student", email: "rahul@email.com", phone: "+91 9876543210", date: "2026-11-01", checkedIn: true },
+                { id: 102, event_id: 1, name: "Priya Nair", type: "Student", email: "priya@email.com", phone: "+91 9876543211", date: "2026-11-02", checkedIn: false },
+                { id: 103, event_id: 2, name: "Vikram Malhotra", type: "Teacher", email: "vikram@school.edu", phone: "+91 9876543212", date: "2026-11-03", checkedIn: true },
+                { id: 104, event_id: 3, name: "Ananya Roy", type: "Student", email: "ananya@email.com", phone: "+91 9876543213", date: "2026-11-04", checkedIn: false },
+                { id: 105, event_id: 5, name: "Sunil Gupta (Parent)", type: "Parent", email: "sunil@gupta.com", phone: "+91 9876543214", date: "2026-11-05", checkedIn: true }
+            ],
+            schedules: [
+                { id: 201, event_id: 1, title: "Inaugural Keynote & Science Ribbon Cutting", speaker: "Dr. Sarah Jenkins", startTime: "09:00 AM", endTime: "10:00 AM", location: "Auditorium Main Stage", status: "Scheduled" },
+                { id: 202, event_id: 1, title: "Robotics Arena & Drone Demos", speaker: "Tech Club Leads", startTime: "10:15 AM", endTime: "01:00 PM", location: "Auditorium East Hall", status: "Scheduled" },
+                { id: 203, event_id: 3, title: "Battle of the School Bands", speaker: "Jury Panel", startTime: "11:00 AM", endTime: "02:00 PM", location: "Amphitheatre Stage", status: "Scheduled" }
+            ],
+            resources: [
+                { id: 301, event_id: 1, name: "HD 4K Laser Projector & Screen", category: "Audio/Visual", quantity: 4, status: "Reserved", cost: 1200 },
+                { id: 302, event_id: 2, name: "Track & Field Sound Megaphones", category: "Audio/Visual", quantity: 6, status: "Available", cost: 400 },
+                { id: 303, event_id: 3, name: "Stage Spotlights & Strobe Lights", category: "Stage & Lighting", quantity: 12, status: "In Use", cost: 2500 }
+            ],
+            volunteers: [
+                { id: 401, event_id: 1, name: "Aarav Patel", role: "Welcome Desk", contact: "+91 9876000001", task: "Distribute registration badges at Entrance Gate A" },
+                { id: 402, event_id: 3, name: "Meera Krishnan", role: "Logistics", contact: "+91 9876000002", task: "Coordinate green room escorts for music performers" }
+            ],
+            budget: [
+                { id: 501, event_id: 1, description: "Science Fair Project Displays", category: "Venue Setup", type: "Expense", amount: 4500, status: "Paid" },
+                { id: 502, event_id: 3, description: "Cultural Band Sound Rigging", category: "Audio & Sound", type: "Expense", amount: 6200, status: "Paid" },
+                { id: 503, event_id: 1, description: "Tech Corp Platinum Sponsorship", category: "Sponsorship", type: "Income", amount: 10000, status: "Received" }
+            ],
+            gallery: [
+                { id: 601, event_id: 1, url: "https://images.unsplash.com/photo-1564069114553-7215e1ff1890?auto=format&fit=crop&w=800&q=80", caption: "Robotics students presenting automated rover model", category: "Academic" },
+                { id: 602, event_id: 3, url: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80", caption: "Amphitheatre musical night performance", category: "Cultural" },
+                { id: 603, event_id: 2, url: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80", caption: "Track sprint finals at the annual sports day", category: "Sports" }
+            ],
+            notifications: [
+                { id: 701, title: "Event Science Fair 2026 Updated", time: "10 mins ago", type: "info" },
+                { id: 702, title: "New Participant Registration Received", time: "1 hour ago", type: "success" }
+            ]
+        };
+
+        // Load data from localStorage or fallback to Seed
+        let appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || seedData;
+
+        // Current Active User State
+        let currentUserRole = "Admin";
+        let eventViewMode = "grid";
+
+        // Chart instances
+        let categoryChartInstance = null;
+        let attendanceChartInstance = null;
+
+        // Save State Utility
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            updateAllComponents();
+        }
+
+        /* ==================== INITIALIZATION & CORE LIFECYCLE ==================== */
+        window.onload = function() {
+            updateAllComponents();
+            initCharts();
+            renderCalendarGrid();
+        };
+
+        function updateAllComponents() {
+            renderDashboardStats();
+            renderEventsList();
+            renderRegistrationsTable();
+            populateEventDropdowns();
+            renderScheduleTimeline();
+            renderResourcesTable();
+            renderVolunteersGrid();
+            renderBudgetTracker();
+            renderGalleryGrid();
+            renderReportsSummary();
+            renderNotifications();
+            updateChartData();
+        }
+
+        /* ==================== NAVIGATION & ROLE CONTROL ==================== */
+        function switchSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            
+            // Show target section
+            const target = document.getElementById(`section-${sectionId}`);
+            if (target) target.classList.remove('hidden');
+
+            // Update Breadcrumb
+            const titles = {
+                'dashboard': 'Dashboard Overview',
+                'events': 'Events Directory',
+                'registrations': 'Registration Desk',
+                'schedule': 'Schedule & Session Planner',
+                'resources': 'Resource Inventory',
+                'volunteers': 'Volunteer Duty Roster',
+                'budget': 'Budget & Ledger',
+                'calendar': 'Calendar View',
+                'gallery': 'Photo Showcase',
+                'reports': 'Reports & Export'
+            };
+            document.getElementById('breadcrumb-active').innerText = titles[sectionId] || sectionId;
+
+            // Highlight Active Nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('text-brand-600', 'bg-brand-50', 'dark:bg-slate-800', 'dark:text-brand-400');
+                item.classList.add('text-slate-600', 'dark:text-slate-300');
+            });
+            const activeNav = document.getElementById(`nav-${sectionId}`);
+            if (activeNav) {
+                activeNav.classList.add('text-brand-600', 'bg-brand-50', 'dark:bg-slate-800', 'dark:text-brand-400');
+                activeNav.classList.remove('text-slate-600', 'dark:text-slate-300');
+            }
+
+            // Close mobile sidebar if open
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (!sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+            }
+        }
+
+        function changeUserRole(role) {
+            currentUserRole = role;
+            document.getElementById('role-display').innerText = `Role: ${role}`;
+            
+            // Adjust permission badges or disable restricted controls
+            const restrictedButtons = document.querySelectorAll('.btn-role-restricted');
+            restrictedButtons.forEach(btn => {
+                if (role === 'Volunteer') {
+                    btn.classList.add('opacity-40', 'pointer-events-none');
+                } else {
+                    btn.classList.remove('opacity-40', 'pointer-events-none');
+                }
+            });
+
+            showToast(`Switched user role to: ${role}`, "info");
+        }
+
+        /* ==================== DASHBOARD & CHARTS ==================== */
+        function renderDashboardStats() {
+            document.getElementById('stat-total-events').innerText = appData.events.length;
+            document.getElementById('stat-registrations').innerText = appData.registrations.length;
+            
+            const totalBudgetAllocated = appData.events.reduce((sum, e) => sum + Number(e.budget || 0), 0);
+            const totalSpent = appData.budget.filter(b => b.type === 'Expense').reduce((sum, b) => sum + Number(b.amount || 0), 0);
+            
+            document.getElementById('stat-budget-spent').innerText = `$${totalSpent.toLocaleString()}`;
+            document.getElementById('stat-budget-allocated').innerText = `of $${totalBudgetAllocated.toLocaleString()} allocated`;
+            document.getElementById('stat-volunteers').innerText = appData.volunteers.length;
+
+            // Render upcoming highlight grid
+            const upcomingGrid = document.getElementById('dashboard-upcoming-grid');
+            const sortedEvents = [...appData.events].slice(0, 3);
+            
+            upcomingGrid.innerHTML = sortedEvents.map(ev => `
+                <div class="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:shadow-md transition-all flex flex-col justify-between space-y-3">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-100 dark:bg-brand-950/60 text-brand-600 dark:text-brand-300">${ev.category}</span>
+                            <span class="text-[11px] font-semibold text-slate-400">${ev.date}</span>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 line-clamp-1">${ev.title}</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1">${ev.description}</p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-200/50 dark:border-slate-700/50 flex justify-between items-center text-xs">
+                        <span class="text-slate-400"><i class="fa-solid fa-location-dot mr-1 text-brand-500"></i> ${ev.venue}</span>
+                        <button onclick="viewEventDetails(${ev.id})" class="font-bold text-brand-500 hover:text-brand-600">Details &rarr;</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function initCharts() {
+            // Category Doughnut Chart
+            const ctxCat = document.getElementById('categoryChart').getContext('2d');
+            categoryChartInstance = new Chart(ctxCat, {
+                type: 'doughnut',
+                data: getCategoryChartData(),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 10 } } }
+                    }
+                }
+            });
+
+            // Attendance Bar Chart
+            const ctxAtt = document.getElementById('attendanceChart').getContext('2d');
+            attendanceChartInstance = new Chart(ctxAtt, {
+                type: 'bar',
+                data: getAttendanceChartData(),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function getCategoryChartData() {
+            const categories = ['Academic', 'Cultural', 'Sports', 'Workshops', 'Parent-Teacher Meets', 'Celebrations'];
+            const counts = categories.map(cat => appData.events.filter(e => e.category === cat).length);
+            return {
+                labels: ['Academic', 'Cultural', 'Sports', 'Workshops', 'PT Meets', 'Celebrations'],
+                datasets: [{
+                    data: counts,
+                    backgroundColor: ['#F97316', '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EC4899'],
+                    borderWidth: 0
+                }]
+            };
+        }
+
+        function getAttendanceChartData() {
+            const labels = appData.events.map(e => e.title.length > 15 ? e.title.substring(0, 15) + '...' : e.title);
+            const registeredCounts = appData.events.map(e => appData.registrations.filter(r => r.event_id === e.id).length);
+            const capacities = appData.events.map(e => Number(e.max_participants || 0));
+            return {
+                labels: labels,
+                datasets: [
+                    { label: 'Registered Attendees', data: registeredCounts, backgroundColor: '#F97316', borderRadius: 6 },
+                    { label: 'Max Capacity', data: capacities, backgroundColor: '#E2E8F0', borderRadius: 6 }
+                ]
+            };
+        }
+
+        function updateChartData() {
+            if (categoryChartInstance && attendanceChartInstance) {
+                categoryChartInstance.data = getCategoryChartData();
+                categoryChartInstance.update();
+                attendanceChartInstance.data = getAttendanceChartData();
+                attendanceChartInstance.update();
+            }
+        }
+
+        /* ==================== EVENT LISTING & CRUD ==================== */
+        function setEventViewMode(mode) {
+            eventViewMode = mode;
+            document.getElementById('btn-view-grid').className = mode === 'grid' ? 
+                "px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-700 text-brand-500 shadow-sm" : 
+                "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
+            document.getElementById('btn-view-table').className = mode === 'table' ? 
+                "px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-700 text-brand-500 shadow-sm" : 
+                "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
+
+            renderEventsList();
+        }
+
+        function renderEventsList() {
+            const query = document.getElementById('event-search-input')?.value.toLowerCase() || '';
+            const selectedCat = document.getElementById('event-category-filter')?.value || 'ALL';
+            const selectedStatus = document.getElementById('event-status-filter')?.value || 'ALL';
+
+            const filtered = appData.events.filter(e => {
+                const matchSearch = e.title.toLowerCase().includes(query) || e.venue.toLowerCase().includes(query) || e.description.toLowerCase().includes(query);
+                const matchCat = selectedCat === 'ALL' || e.category === selectedCat;
+                const matchStatus = selectedStatus === 'ALL' || e.status === selectedStatus;
+                return matchSearch && matchCat && matchStatus;
+            });
+
+            const gridContainer = document.getElementById('events-grid-container');
+            const tableContainer = document.getElementById('events-table-container');
+
+            if (eventViewMode === 'grid') {
+                gridContainer.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+
+                gridContainer.innerHTML = filtered.map(ev => {
+                    const registeredCount = appData.registrations.filter(r => r.event_id === ev.id).length;
+                    const percent = Math.min(100, Math.round((registeredCount / (ev.max_participants || 1)) * 100));
+
+                    return `
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-lg transition-all group">
+                            <div>
+                                <div class="relative h-40 overflow-hidden">
+                                    <img src="${ev.image || 'https://placehold.co/600x400/F97316/FFF?text=School+Event'}" alt="${ev.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
+                                    <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider bg-white/90 text-slate-800 backdrop-blur-md shadow-sm">
+                                        ${ev.category}
+                                    </span>
+                                    <span class="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold text-white bg-slate-900/80 backdrop-blur-md">
+                                        ${ev.status}
+                                    </span>
+                                </div>
+                                <div class="p-5 space-y-3">
+                                    <h3 class="font-bold text-base text-slate-900 dark:text-white leading-snug line-clamp-1">${ev.title}</h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">${ev.description}</p>
+                                    
+                                    <div class="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                                        <div class="flex items-center space-x-2">
+                                            <i class="fa-regular fa-calendar text-brand-500 w-4"></i>
+                                            <span>${ev.date} (${ev.time})</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <i class="fa-solid fa-location-dot text-brand-500 w-4"></i>
+                                            <span class="truncate">${ev.venue}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Capacity Progress Bar -->
+                                    <div class="space-y-1">
+                                        <div class="flex justify-between text-[11px] font-semibold">
+                                            <span class="text-slate-400">Registrations</span>
+                                            <span class="text-brand-500 font-bold">${registeredCount} / ${ev.max_participants} (${percent}%)</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                            <div class="h-full bg-brand-500 rounded-full" style="width: ${percent}%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between gap-2">
+                                <button onclick="viewEventDetails(${ev.id})" class="px-3 py-1.5 bg-brand-50 text-brand-600 dark:bg-slate-800 dark:text-brand-400 rounded-xl font-bold text-xs hover:bg-brand-100">
+                                    View Details
+                                </button>
+                                <div class="flex items-center space-x-1">
+                                    <button onclick="editEvent(${ev.id})" class="btn-role-restricted p-2 text-slate-400 hover:text-brand-500 rounded-lg"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button onclick="deleteEvent(${ev.id})" class="btn-role-restricted p-2 text-slate-400 hover:text-rose-500 rounded-lg"><i class="fa-solid fa-trash-can"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                gridContainer.classList.add('hidden');
+                tableContainer.classList.remove('hidden');
+
+                const tableBody = document.getElementById('events-table-body');
+                tableBody.innerHTML = filtered.map(ev => `
+                    <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                        <td class="p-4 font-bold text-slate-800 dark:text-slate-100">${ev.title}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 font-semibold">${ev.category}</span></td>
+                        <td class="p-4 text-slate-500">${ev.date}</td>
+                        <td class="p-4 text-slate-500">${ev.venue}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded font-bold text-[10px] bg-brand-100 text-brand-700">${ev.status}</span></td>
+                        <td class="p-4 text-slate-500">${ev.max_participants}</td>
+                        <td class="p-4 text-right space-x-2">
+                            <button onclick="viewEventDetails(${ev.id})" class="text-brand-500 font-bold hover:underline">View</button>
+                            <button onclick="editEvent(${ev.id})" class="btn-role-restricted text-slate-400 hover:text-slate-700"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteEvent(${ev.id})" class="btn-role-restricted text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function handleSaveEvent(e) {
+            e.preventDefault();
+            const id = document.getElementById('event-id-input').value;
+            const newEvent = {
+                id: id ? Number(id) : Date.now(),
+                title: document.getElementById('event-title-input').value,
+                category: document.getElementById('event-category-input').value,
+                status: document.getElementById('event-status-input').value,
+                date: document.getElementById('event-date-input').value,
+                time: document.getElementById('event-time-input').value,
+                venue: document.getElementById('event-venue-input').value,
+                max_participants: Number(document.getElementById('event-capacity-input').value),
+                budget: Number(document.getElementById('event-budget-input').value),
+                image: document.getElementById('event-image-input').value || 'https://images.unsplash.com/photo-1564069114553-7215e1ff1890?auto=format&fit=crop&w=800&q=80',
+                description: document.getElementById('event-desc-input').value
+            };
+
+            if (id) {
+                const idx = appData.events.findIndex(item => item.id === Number(id));
+                if (idx !== -1) appData.events[idx] = newEvent;
+                showToast("Event updated successfully!", "success");
+            } else {
+                appData.events.unshift(newEvent);
+                showToast("New event created successfully!", "success");
+            }
+
+            saveState();
+            closeModal('modal-event-form');
+        }
+
+        function editEvent(id) {
+            const ev = appData.events.find(item => item.id === id);
+            if (!ev) return;
+
+            document.getElementById('modal-event-form-title').innerText = "Edit School Event";
+            document.getElementById('event-id-input').value = ev.id;
+            document.getElementById('event-title-input').value = ev.title;
+            document.getElementById('event-category-input').value = ev.category;
+            document.getElementById('event-status-input').value = ev.status;
+            document.getElementById('event-date-input').value = ev.date;
+            document.getElementById('event-time-input').value = ev.time;
+            document.getElementById('event-venue-input').value = ev.venue;
+            document.getElementById('event-capacity-input').value = ev.max_participants;
+            document.getElementById('event-budget-input').value = ev.budget;
+            document.getElementById('event-image-input').value = ev.image;
+            document.getElementById('event-desc-input').value = ev.description;
+
+            openModal('modal-event-form');
+        }
+
+        function deleteEvent(id) {
+            if (confirm("Are you sure you want to delete this event and associated data?")) {
+                appData.events = appData.events.filter(e => e.id !== id);
+                appData.registrations = appData.registrations.filter(r => r.event_id !== id);
+                saveState();
+                showToast("Event removed from catalogue.", "info");
+            }
+        }
+
+        function viewEventDetails(id) {
+            const ev = appData.events.find(e => e.id === id);
+            if (!ev) return;
+
+            document.getElementById('detail-img').src = ev.image;
+            document.getElementById('detail-title').innerText = ev.title;
+            document.getElementById('detail-category-badge').innerText = ev.category;
+            document.getElementById('detail-status-badge').innerText = ev.status;
+            document.getElementById('detail-description').innerText = ev.description;
+            document.getElementById('detail-date').innerText = ev.date;
+            document.getElementById('detail-time').innerText = ev.time;
+            document.getElementById('detail-venue').innerText = ev.venue;
+            document.getElementById('detail-budget').innerText = `$${Number(ev.budget || 0).toLocaleString()}`;
+
+            // Render detail schedule tab
+            const eventSchedules = appData.schedules.filter(s => s.event_id === id);
+            document.getElementById('detail-schedule-list').innerHTML = eventSchedules.length ? 
+                eventSchedules.map(s => `<div class="p-2.5 bg-slate-50 dark:bg-slate-800 rounded-lg"><strong>${s.startTime} - ${s.endTime}:</strong> ${s.title} (${s.speaker})</div>`).join('') :
+                '<p class="text-slate-400">No sessions scheduled yet for this event.</p>';
+
+            // Render detail attendees tab
+            const eventAttendees = appData.registrations.filter(r => r.event_id === id);
+            document.getElementById('detail-attendees-list').innerHTML = eventAttendees.length ?
+                eventAttendees.map(r => `<div class="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg flex justify-between"><span>${r.name} (${r.type})</span><span class="font-bold text-brand-500">${r.checkedIn ? 'Checked In' : 'Not Checked In'}</span></div>`).join('') :
+                '<p class="text-slate-400">No registered attendees yet.</p>';
+
+            openModal('modal-event-detail');
+        }
+
+        function switchDetailTab(tabName) {
+            ['summary', 'schedule', 'attendees'].forEach(t => {
+                document.getElementById(`detail-tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).classList.remove('border-brand-500', 'text-brand-500');
+                document.getElementById(`tab-btn-${t}`).classList.add('border-transparent', 'text-slate-400');
+            });
+            document.getElementById(`detail-tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).classList.add('border-brand-500', 'text-brand-500');
+        }
+
+        /* ==================== REGISTRATIONS & CHECK-IN ==================== */
+        function renderRegistrationsTable() {
+            const search = document.getElementById('reg-search-input')?.value.toLowerCase() || '';
+            const eventFilter = document.getElementById('reg-event-filter')?.value || 'ALL';
+
+            const filtered = appData.registrations.filter(r => {
+                const matchSearch = r.name.toLowerCase().includes(search) || r.email.toLowerCase().includes(search);
+                const matchEvent = eventFilter === 'ALL' || r.event_id === Number(eventFilter);
+                return matchSearch && matchEvent;
+            });
+
+            // Update stats
+            const total = appData.registrations.length;
+            const checked = appData.registrations.filter(r => r.checkedIn).length;
+            const rate = total ? Math.round((checked / total) * 100) : 0;
+
+            document.getElementById('reg-stat-total').innerText = total;
+            document.getElementById('reg-stat-checked').innerText = checked;
+            document.getElementById('reg-stat-rate').innerText = `${rate}%`;
+
+            const tbody = document.getElementById('registrations-table-body');
+            tbody.innerHTML = filtered.map(r => {
+                const ev = appData.events.find(e => e.id === r.event_id);
+                return `
+                    <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                        <td class="p-4 font-bold text-slate-800 dark:text-slate-100">${r.name}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">${r.type}</span></td>
+                        <td class="p-4 text-brand-500 font-semibold">${ev ? ev.title : 'Unassigned'}</td>
+                        <td class="p-4 text-slate-500">${r.email}<br><span class="text-[10px] text-slate-400">${r.phone}</span></td>
+                        <td class="p-4 text-slate-400">${r.date}</td>
+                        <td class="p-4">
+                            <button onclick="toggleCheckIn(${r.id})" class="px-3 py-1 rounded-full text-[10px] font-extrabold cursor-pointer transition-colors ${r.checkedIn ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-rose-100 text-rose-700 hover:bg-rose-200'}">
+                                ${r.checkedIn ? '✓ Checked In' : '✕ Not Checked In'}
+                            </button>
+                        </td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteRegistration(${r.id})" class="text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleCheckIn(regId) {
+            const reg = appData.registrations.find(r => r.id === regId);
+            if (reg) {
+                reg.checkedIn = !reg.checkedIn;
+                saveState();
+                showToast(`Check-in status updated for ${reg.name}`, "info");
+            }
+        }
+
+        function handleSaveRegistration(e) {
+            e.preventDefault();
+            const newReg = {
+                id: Date.now(),
+                event_id: Number(document.getElementById('reg-event-id').value),
+                name: document.getElementById('reg-name').value,
+                type: document.getElementById('reg-type').value,
+                phone: document.getElementById('reg-phone').value,
+                email: document.getElementById('reg-email').value,
+                date: new Date().toISOString().split('T')[0],
+                checkedIn: false
+            };
+
+            appData.registrations.unshift(newReg);
+            saveState();
+            closeModal('modal-registration');
+            showToast(`Registration confirmed for ${newReg.name}!`, "success");
+        }
+
+        function deleteRegistration(id) {
+            if (confirm("Remove participant registration?")) {
+                appData.registrations = appData.registrations.filter(r => r.id !== id);
+                saveState();
+                showToast("Registration removed.", "info");
+            }
+        }
+
+        /* ==================== SCHEDULE & TIMELINES ==================== */
+        function renderScheduleTimeline() {
+            const eventSelect = document.getElementById('schedule-event-select');
+            if (!eventSelect) return;
+
+            const selectedEventId = Number(eventSelect.value || appData.events[0]?.id || 0);
+            const eventSessions = appData.schedules.filter(s => s.event_id === selectedEventId);
+
+            const timelineContainer = document.getElementById('schedule-timeline-container');
+            if (!eventSessions.length) {
+                timelineContainer.innerHTML = `<p class="text-slate-400 text-xs">No sessions created for this event yet. Click "+ Add Session Slot" to map schedule.</p>`;
+                return;
+            }
+
+            timelineContainer.innerHTML = eventSessions.map(s => `
+                <div class="relative group">
+                    <div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-brand-500 ring-4 ring-white dark:ring-slate-900"></div>
+                    <div class="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl space-y-2 border border-slate-200/60 dark:border-slate-700/60">
+                        <div class="flex justify-between items-start">
+                            <span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-brand-100 text-brand-700">${s.startTime} - ${s.endTime}</span>
+                            <button onclick="deleteSession(${s.id})" class="btn-role-restricted text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${s.title}</h4>
+                        <div class="flex flex-wrap gap-4 text-xs text-slate-500">
+                            <span><i class="fa-solid fa-user-tie mr-1 text-brand-500"></i> Host: ${s.speaker}</span>
+                            <span><i class="fa-solid fa-door-open mr-1 text-brand-500"></i> Location: ${s.location}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleSaveSession(e) {
+            e.preventDefault();
+            const newSession = {
+                id: Date.now(),
+                event_id: Number(document.getElementById('session-event-id').value),
+                title: document.getElementById('session-title').value,
+                speaker: document.getElementById('session-speaker').value || 'Unassigned',
+                location: document.getElementById('session-location').value || 'TBD',
+                startTime: document.getElementById('session-start').value || '09:00 AM',
+                endTime: document.getElementById('session-end').value || '10:00 AM',
+                status: 'Scheduled'
+            };
+
+            appData.schedules.push(newSession);
+            saveState();
+            closeModal('modal-session');
+            showToast("Session slot added to timeline!", "success");
+        }
+
+        function deleteSession(id) {
+            appData.schedules = appData.schedules.filter(s => s.id !== id);
+            saveState();
+            showToast("Session removed.", "info");
+        }
+
+        /* ==================== RESOURCES & INVENTORY ==================== */
+        function renderResourcesTable() {
+            const tbody = document.getElementById('resources-table-body');
+            tbody.innerHTML = appData.resources.map(res => {
+                const ev = appData.events.find(e => e.id === res.event_id);
+                return `
+                    <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                        <td class="p-4 font-bold text-slate-800 dark:text-slate-100">${res.name}</td>
+                        <td class="p-4 text-slate-500">${res.category}</td>
+                        <td class="p-4 text-brand-500 font-semibold">${ev ? ev.title : 'General Inventory'}</td>
+                        <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${res.quantity}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">${res.status}</span></td>
+                        <td class="p-4 font-semibold text-slate-700 dark:text-slate-300">$${res.cost}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteResource(${res.id})" class="btn-role-restricted text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function handleSaveResource(e) {
+            e.preventDefault();
+            const newRes = {
+                id: Date.now(),
+                name: document.getElementById('resource-name').value,
+                category: document.getElementById('resource-category').value,
+                quantity: Number(document.getElementById('resource-qty').value),
+                event_id: Number(document.getElementById('resource-event-id').value),
+                status: document.getElementById('resource-status').value,
+                cost: Number(document.getElementById('resource-cost').value || 0)
+            };
+
+            appData.resources.push(newRes);
+            saveState();
+            closeModal('modal-resource');
+            showToast("Resource registered in inventory!", "success");
+        }
+
+        function deleteResource(id) {
+            appData.resources = appData.resources.filter(r => r.id !== id);
+            saveState();
+            showToast("Resource item deleted.", "info");
+        }
+
+        /* ==================== VOLUNTEERS COORDINATION ==================== */
+        function renderVolunteersGrid() {
+            const grid = document.getElementById('volunteers-grid');
+            grid.innerHTML = appData.volunteers.map(v => {
+                const ev = appData.events.find(e => e.id === v.event_id);
+                return `
+                    <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-300 flex items-center justify-center font-bold text-sm">
+                                    ${v.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${v.name}</h4>
+                                    <span class="text-[11px] font-semibold text-brand-500">${v.role}</span>
+                                </div>
+                            </div>
+                            <button onclick="deleteVolunteer(${v.id})" class="btn-role-restricted text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700">
+                            <strong>Duty Task:</strong> ${v.task}
+                        </p>
+                        <div class="flex justify-between items-center text-xs text-slate-400 pt-1">
+                            <span><i class="fa-solid fa-calendar text-brand-500 mr-1"></i> ${ev ? ev.title : 'General'}</span>
+                            <span class="font-bold text-slate-600 dark:text-slate-300">${v.contact}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleSaveVolunteer(e) {
+            e.preventDefault();
+            const newVol = {
+                id: Date.now(),
+                name: document.getElementById('vol-name').value,
+                role: document.getElementById('vol-role').value,
+                contact: document.getElementById('vol-contact').value,
+                event_id: Number(document.getElementById('vol-event-id').value),
+                task: document.getElementById('vol-task').value || 'Assigned to Event Logistics'
+            };
+
+            appData.volunteers.push(newVol);
+            saveState();
+            closeModal('modal-volunteer');
+            showToast(`Duty assigned to volunteer ${newVol.name}!`, "success");
+        }
+
+        function deleteVolunteer(id) {
+            appData.volunteers = appData.volunteers.filter(v => v.id !== id);
+            saveState();
+            showToast("Volunteer duty unassigned.", "info");
+        }
+
+        /* ==================== BUDGET TRACKING & EXPENSES ==================== */
+        function renderBudgetTracker() {
+            const totalAllocated = appData.events.reduce((sum, e) => sum + Number(e.budget || 0), 0);
+            const totalExpenses = appData.budget.filter(b => b.type === 'Expense').reduce((sum, b) => sum + Number(b.amount || 0), 0);
+            const totalIncome = appData.budget.filter(b => b.type === 'Income').reduce((sum, b) => sum + Number(b.amount || 0), 0);
+            const remaining = totalAllocated + totalIncome - totalExpenses;
+            const percent = totalAllocated ? Math.min(100, Math.round((totalExpenses / totalAllocated) * 100)) : 0;
+
+            document.getElementById('budget-summary-allocated').innerText = `$${totalAllocated.toLocaleString()}`;
+            document.getElementById('budget-summary-spent').innerText = `$${totalExpenses.toLocaleString()}`;
+            document.getElementById('budget-summary-remaining').innerText = `$${remaining.toLocaleString()}`;
+            document.getElementById('budget-utilization-percent').innerText = `${percent}%`;
+            document.getElementById('budget-progress-bar').style.width = `${percent}%`;
+
+            const tbody = document.getElementById('budget-table-body');
+            tbody.innerHTML = appData.budget.map(b => {
+                const ev = appData.events.find(e => e.id === b.event_id);
+                const isExpense = b.type === 'Expense';
+                return `
+                    <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                        <td class="p-4 font-bold text-slate-800 dark:text-slate-100">${b.description}</td>
+                        <td class="p-4 text-brand-500 font-semibold">${ev ? ev.title : 'General Fund'}</td>
+                        <td class="p-4 text-slate-500">${b.category || 'General'}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${isExpense ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}">${b.type}</span></td>
+                        <td class="p-4 font-bold ${isExpense ? 'text-rose-500' : 'text-emerald-500'}">$${Number(b.amount).toLocaleString()}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">${b.status}</span></td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteTransaction(${b.id})" class="btn-role-restricted text-rose-500 hover:text-rose-700"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function handleSaveTransaction(e) {
+            e.preventDefault();
+            const newTrans = {
+                id: Date.now(),
+                description: document.getElementById('trans-desc').value,
+                type: document.getElementById('trans-type').value,
+                amount: Number(document.getElementById('trans-amount').value),
+                event_id: Number(document.getElementById('trans-event-id').value),
+                category: document.getElementById('trans-category').value || 'Operations',
+                status: 'Paid'
+            };
+
+            appData.budget.push(newTrans);
+            saveState();
+            closeModal('modal-transaction');
+            showToast("Ledger entry saved!", "success");
+        }
+
+        function deleteTransaction(id) {
+            appData.budget = appData.budget.filter(b => b.id !== id);
+            saveState();
+            showToast("Transaction removed.", "info");
+        }
+
+        /* ==================== INTERACTIVE CALENDAR ==================== */
+        function renderCalendarGrid() {
+            const grid = document.getElementById('calendar-grid-cells');
+            grid.innerHTML = '';
+
+            // November 2026 Grid (Starts on Sunday = 1)
+            const daysInMonth = 30;
+            const startOffset = 0; // Nov 1 2026 is Sunday
+
+            for (let i = 0; i < startOffset; i++) {
+                grid.innerHTML += `<div class="h-24 bg-slate-50/40 dark:bg-slate-900/40 rounded-xl border border-dashed border-slate-200 dark:border-slate-800"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `2026-11-${day < 10 ? '0' + day : day}`;
+                const eventsOnDay = appData.events.filter(e => e.date === dateStr);
+
+                grid.innerHTML += `
+                    <div class="h-28 p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between hover:border-brand-500 transition-colors">
+                        <span class="text-xs font-bold ${eventsOnDay.length ? 'text-brand-500 font-extrabold' : 'text-slate-400'}">${day}</span>
+                        <div class="space-y-1 overflow-y-auto">
+                            ${eventsOnDay.map(ev => `
+                                <div onclick="viewEventDetails(${ev.id})" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-brand-50 text-brand-700 dark:bg-slate-800 dark:text-brand-300 truncate cursor-pointer hover:bg-brand-100">
+                                    ${ev.title}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        /* ==================== PHOTO GALLERY ==================== */
+        function filterGallery(category) {
+            renderGalleryGrid(category);
+        }
+
+        function renderGalleryGrid(filterCat = 'ALL') {
+            const grid = document.getElementById('gallery-grid-container');
+            const filtered = appData.gallery.filter(g => filterCat === 'ALL' || g.category === filterCat);
+
+            grid.innerHTML = filtered.map(g => `
+                <div onclick="openLightbox('${g.url}', '${g.caption}')" class="group relative h-56 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all">
+                    <img src="${g.url}" alt="${g.caption}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-90"></div>
+                    <div class="absolute bottom-3 left-4 right-4">
+                        <span class="px-2 py-0.5 bg-brand-500 text-white font-bold text-[9px] rounded-md">${g.category || 'Event'}</span>
+                        <p class="text-xs font-bold text-white mt-1 truncate">${g.caption}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openLightbox(url, caption) {
+            document.getElementById('lightbox-img').src = url;
+            document.getElementById('lightbox-caption').innerText = caption;
+            openModal('modal-lightbox');
+        }
+
+        function handleSaveGalleryPhoto(e) {
+            e.preventDefault();
+            const evId = Number(document.getElementById('gallery-event-id').value);
+            const ev = appData.events.find(item => item.id === evId);
+
+            const newPhoto = {
+                id: Date.now(),
+                event_id: evId,
+                url: document.getElementById('gallery-url').value,
+                caption: document.getElementById('gallery-caption').value,
+                category: ev ? ev.category : 'Academic'
+            };
+
+            appData.gallery.unshift(newPhoto);
+            saveState();
+            closeModal('modal-upload-photo');
+            showToast("Photo added to gallery!", "success");
+        }
+
+        /* ==================== REPORTS & EXPORTING ==================== */
+        function renderReportsSummary() {
+            document.getElementById('report-events-count').innerText = appData.events.length;
+            document.getElementById('report-registrations-count').innerText = appData.registrations.length;
+            document.getElementById('report-volunteers-count').innerText = appData.volunteers.length;
+            
+            const totalBudget = appData.events.reduce((sum, e) => sum + Number(e.budget || 0), 0);
+            document.getElementById('report-budget-sum').innerText = `$${totalBudget.toLocaleString()}`;
+
+            const tbody = document.getElementById('report-table-body');
+            tbody.innerHTML = appData.events.map(ev => `
+                <tr>
+                    <td class="p-3 font-bold">${ev.title}</td>
+                    <td class="p-3">${ev.category}</td>
+                    <td class="p-3">${ev.date}</td>
+                    <td class="p-3">${ev.venue}</td>
+                    <td class="p-3">${ev.status}</td>
+                    <td class="p-3 font-semibold text-brand-500">$${Number(ev.budget).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportCSVReport() {
+            let csvContent = "data:text/csv;charset=utf-8,ID,Title,Category,Date,Venue,Status,MaxCapacity,Budget\n";
+            appData.events.forEach(e => {
+                csvContent += `"${e.id}","${e.title}","${e.category}","${e.date}","${e.venue}","${e.status}","${e.max_participants}","${e.budget}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `EventSchool_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("CSV Overview Report Downloaded!", "success");
+        }
+
+        /* ==================== HELPER DROPDOWNS & NOTIFICATIONS ==================== */
+        function populateEventDropdowns() {
+            const dropdownIds = ['reg-event-id', 'reg-event-filter', 'schedule-event-select', 'session-event-id', 'resource-event-id', 'vol-event-id', 'trans-event-id', 'gallery-event-id'];
+            
+            dropdownIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+
+                const currentVal = el.value;
+                let html = (id === 'reg-event-filter') ? '<option value="ALL">All Events</option>' : '';
+
+                html += appData.events.map(e => `<option value="${e.id}">${e.title}</option>`).join('');
+                el.innerHTML = html;
+                if (currentVal) el.value = currentVal;
+            });
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notifications-list');
+            list.innerHTML = appData.notifications.map(n => `
+                <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl space-y-1">
+                    <div class="flex justify-between text-xs font-bold text-slate-800 dark:text-slate-100">
+                        <span>${n.title}</span>
+                        <span class="text-[10px] text-slate-400 font-normal">${n.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleNotificationsModal() {
+            document.getElementById('modal-notifications').classList.toggle('hidden');
+        }
+
+        function clearNotifications() {
+            appData.notifications = [];
+            saveState();
+            toggleNotificationsModal();
+            showToast("Notifications cleared", "info");
+        }
+
+        /* ==================== UTILITY MODAL & TOAST MANAGERS ==================== */
+        function openModal(modalId) {
+            document.getElementById(modalId)?.classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId)?.classList.add('hidden');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-emerald-500 text-white',
+                info: 'bg-brand-500 text-white',
+                warning: 'bg-amber-500 text-white',
+                error: 'bg-rose-500 text-white'
+            };
+
+            toast.className = `px-4 py-3 rounded-xl shadow-2xl text-xs font-bold ${colors[type]} transition-all duration-300 transform translate-y-2 flex items-center space-x-2 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
